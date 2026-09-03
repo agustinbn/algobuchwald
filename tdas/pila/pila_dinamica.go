@@ -2,6 +2,8 @@ package pila
 
 /* Definición del struct pila proporcionado por la cátedra. */
 
+const CAPACIDAD_INICIAL = 10
+
 type pilaDinamica[T any] struct {
 	datos    []T
 	cantidad int
@@ -9,7 +11,7 @@ type pilaDinamica[T any] struct {
 
 func CrearPilaDinamica[T any]() Pila[T] {
 	return &pilaDinamica[T]{
-		datos:    make([]T, 10),
+		datos:    make([]T, CAPACIDAD_INICIAL),
 		cantidad: 0,
 	}
 }
@@ -42,5 +44,12 @@ func (p *pilaDinamica[T]) Apilar(elemento T) {
 func (p *pilaDinamica[T]) Desapilar() T {
 	elemento := p.VerTope()
 	p.cantidad--
+	if len(p.datos) > CAPACIDAD_INICIAL && p.cantidad*4 <= len(p.datos) {
+		nuevaCapacidad := len(p.datos) / 2
+		if nuevaCapacidad < CAPACIDAD_INICIAL {
+			nuevaCapacidad = CAPACIDAD_INICIAL
+		}
+		p.redimensionar(nuevaCapacidad)
+	}
 	return elemento
 }

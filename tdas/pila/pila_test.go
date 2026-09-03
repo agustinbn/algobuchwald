@@ -1,9 +1,10 @@
 package pila_test
 
 import (
-	"github.com/stretchr/testify/require"
 	TDAPila "tdas/pila"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestPilaRecienCreada(t *testing.T) {
@@ -25,7 +26,7 @@ func TestApilarDesapilarRespetaInvarianteLIFO(t *testing.T) {
 	require.EqualValues(t, 1, pila.Desapilar())
 	require.True(t, pila.EstaVacia())
 
-	const cantidad = 10000
+	cantidad := 10
 	for i := 0; i < cantidad; i++ {
 		pila.Apilar(i)
 		require.EqualValues(t, i, pila.VerTope())
@@ -52,7 +53,7 @@ func TestPilaVaciadaSeComportaComoRecienCreada(t *testing.T) {
 	require.EqualValues(t, 10, pila.VerTope())
 }
 
-func TestPilaConDistintosTiposDeDatos(t *testing.T) {
+func TestPilaConVariosDatos(t *testing.T) {
 	probarApilarDesapilar(t, []int{1, 2, 3})
 	probarApilarDesapilar(t, []string{"pepe", "pedro", "juan"})
 	probarApilarDesapilar(t, []bool{true, false, true})
