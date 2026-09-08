@@ -25,14 +25,30 @@ func TestApilarDesapilarRespetaInvarianteLIFO(t *testing.T) {
 	require.EqualValues(t, 2, pila.Desapilar())
 	require.EqualValues(t, 1, pila.Desapilar())
 	require.True(t, pila.EstaVacia())
+}
 
-	cantidad := 10
+func TestApilarSuperaCapacidadInicialYRedimensiona(t *testing.T) {
+	pila := TDAPila.CrearPilaDinamica[int]()
+
+	cantidad := 25
 	for i := 0; i < cantidad; i++ {
 		pila.Apilar(i)
 		require.EqualValues(t, i, pila.VerTope())
 	}
 	for i := cantidad - 1; i >= 0; i-- {
-		require.EqualValues(t, i, pila.VerTope())
+		require.EqualValues(t, i, pila.Desapilar())
+	}
+	require.True(t, pila.EstaVacia())
+}
+
+func TestDesapilarAchicaPilaGrande(t *testing.T) {
+	pila := TDAPila.CrearPilaDinamica[int]()
+
+	cantidad := 40
+	for i := 0; i < cantidad; i++ {
+		pila.Apilar(i)
+	}
+	for i := cantidad - 1; i >= 0; i-- {
 		require.EqualValues(t, i, pila.Desapilar())
 	}
 	require.True(t, pila.EstaVacia())

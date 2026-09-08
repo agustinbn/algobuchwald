@@ -2,7 +2,11 @@ package pila
 
 /* Definición del struct pila proporcionado por la cátedra. */
 
-const CAPACIDAD_INICIAL = 10
+const (
+	_CAPACIDAD_INICIAL   = 10
+	_FACTOR_REDIMENSION  = 2
+	_FACTOR_ACHICAMIENTO = 4
+)
 
 type pilaDinamica[T any] struct {
 	datos    []T
@@ -11,7 +15,7 @@ type pilaDinamica[T any] struct {
 
 func CrearPilaDinamica[T any]() Pila[T] {
 	return &pilaDinamica[T]{
-		datos:    make([]T, CAPACIDAD_INICIAL),
+		datos:    make([]T, _CAPACIDAD_INICIAL),
 		cantidad: 0,
 	}
 }
@@ -35,7 +39,7 @@ func (p *pilaDinamica[T]) VerTope() T {
 
 func (p *pilaDinamica[T]) Apilar(elemento T) {
 	if p.cantidad == len(p.datos) {
-		p.redimensionar(len(p.datos) * 2)
+		p.redimensionar(len(p.datos) * _FACTOR_REDIMENSION)
 	}
 	p.datos[p.cantidad] = elemento
 	p.cantidad++
@@ -44,11 +48,8 @@ func (p *pilaDinamica[T]) Apilar(elemento T) {
 func (p *pilaDinamica[T]) Desapilar() T {
 	elemento := p.VerTope()
 	p.cantidad--
-	if len(p.datos) > CAPACIDAD_INICIAL && p.cantidad*4 <= len(p.datos) {
-		nuevaCapacidad := len(p.datos) / 2
-		if nuevaCapacidad < CAPACIDAD_INICIAL {
-			nuevaCapacidad = CAPACIDAD_INICIAL
-		}
+	if len(p.datos) > _CAPACIDAD_INICIAL && p.cantidad*_FACTOR_ACHICAMIENTO <= len(p.datos) {
+		nuevaCapacidad := max(len(p.datos)/_FACTOR_REDIMENSION, _CAPACIDAD_INICIAL)
 		p.redimensionar(nuevaCapacidad)
 	}
 	return elemento
