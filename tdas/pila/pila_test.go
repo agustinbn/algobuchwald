@@ -54,6 +54,21 @@ func TestDesapilarAchicaPilaGrande(t *testing.T) {
 	require.True(t, pila.EstaVacia())
 }
 
+func TestPilaConVolumenGrande(t *testing.T) {
+	pila := TDAPila.CrearPilaDinamica[int]()
+
+	cantidad := 10000
+	for i := 0; i < cantidad; i++ {
+		pila.Apilar(i)
+		require.EqualValues(t, i, pila.VerTope())
+	}
+	for i := cantidad - 1; i >= 0; i-- {
+		require.EqualValues(t, i, pila.Desapilar())
+	}
+	require.True(t, pila.EstaVacia())
+	require.PanicsWithValue(t, "La pila esta vacia", func() { pila.Desapilar() })
+}
+
 func TestPilaVaciadaSeComportaComoRecienCreada(t *testing.T) {
 	pila := TDAPila.CrearPilaDinamica[int]()
 	pila.Apilar(1)
