@@ -12,6 +12,12 @@ type Posicion struct {
 	columna int
 }
 
+type Direccion struct {
+	signo        string
+	deltaFila    int
+	deltaColumna int
+}
+
 const (
 	_SIGNO_INICIO byte   = 'S'
 	_SIGNO_FIN    byte   = 'E'
@@ -22,19 +28,11 @@ const (
 	_DERECHA      string = "DERECHA"
 )
 
-func obtenerDireccion(direccion string) (deltaFila, deltaColumna int) {
-	switch direccion {
-	case _ARRIBA:
-		return -1, 0
-	case _ABAJO:
-		return 1, 0
-	case _IZQUIERDA:
-		return 0, -1
-	case _DERECHA:
-		return 0, 1
-	default:
-		return 0, 0
-	}
+var _DIRECCIONES = []Direccion{
+	{_ARRIBA, -1, 0},
+	{_ABAJO, 1, 0},
+	{_IZQUIERDA, 0, -1},
+	{_DERECHA, 0, 1},
 }
 
 func esTransitable(laberinto []string, filas int, columnas int, pos Posicion) bool {
@@ -76,15 +74,8 @@ func resolverLaberinto(laberinto []string, filas int, columnas int, inicio Posic
 			break
 		}
 
-		direcciones := []string{
-			_ARRIBA,
-			_ABAJO,
-			_IZQUIERDA,
-			_DERECHA,
-		}
-
-		for _, dir := range direcciones {
-			deltaFila, deltaColumna := obtenerDireccion(dir)
+		for _, dir := range _DIRECCIONES {
+			deltaFila, deltaColumna := dir.deltaFila, dir.deltaColumna
 			nuevaFila := actual.fila + deltaFila
 			nuevaColumna := actual.columna + deltaColumna
 			vecino := Posicion{
@@ -96,7 +87,7 @@ func resolverLaberinto(laberinto []string, filas int, columnas int, inicio Posic
 				if !visitado[vecino.fila][vecino.columna] {
 					visitado[vecino.fila][vecino.columna] = true
 					origen[vecino.fila][vecino.columna] = actual
-					direccion[vecino.fila][vecino.columna] = dir
+					direccion[vecino.fila][vecino.columna] = dir.signo
 					pendientes.Encolar(vecino)
 				}
 			}
@@ -141,9 +132,10 @@ func main() {
 			fmt.Fscan(os.Stdin, &laberinto[i])
 
 			for j := 0; j < columnas; j++ {
-				if laberinto[i][j] == _SIGNO_INICIO {
+				switch laberinto[i][j] {
+				case _SIGNO_INICIO:
 					inicio = Posicion{i, j}
-				} else if laberinto[i][j] == _SIGNO_FIN {
+				case _SIGNO_FIN:
 					fin = Posicion{i, j}
 				}
 			}
