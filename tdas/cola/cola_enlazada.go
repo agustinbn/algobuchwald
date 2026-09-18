@@ -33,11 +33,10 @@ func (c *colaEnlazada[T]) Encolar(elemento T) {
 	nuevoNodo := crearNodo(elemento)
 	if c.EstaVacia() {
 		c.primero = nuevoNodo
-		c.ultimo = nuevoNodo
 	} else {
 		c.ultimo.siguiente = nuevoNodo
-		c.ultimo = nuevoNodo
 	}
+	c.ultimo = nuevoNodo
 }
 
 func (c *colaEnlazada[T]) Desencolar() T {

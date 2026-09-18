@@ -30,12 +30,12 @@ func TestEncolarDesencolarRespetaInvarianteFIFO(t *testing.T) {
 func TestEncolarConVolumen(t *testing.T) {
 	cola := TDACola.CrearColaEnlazada[int]()
 
-	cantidad := 200
-	for i := 0; i < cantidad; i++ {
+	cantidad := 10000
+	for i := range cantidad {
 		cola.Encolar(i)
 		require.EqualValues(t, 0, cola.VerPrimero())
 	}
-	for i := 0; i < cantidad; i++ {
+	for i := range cantidad {
 		require.EqualValues(t, i, cola.Desencolar())
 	}
 	require.True(t, cola.EstaVacia())
