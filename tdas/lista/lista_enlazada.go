@@ -17,6 +17,10 @@ type iterListaEnlazada[T any] struct {
 	actual   *nodoLista[T]
 }
 
+func crearNodo[T any](dato T) *nodoLista[T] {
+	return &nodoLista[T]{dato: dato}
+}
+
 func CrearListaEnlazada[T any]() Lista[T] {
 	return &listaEnlazada[T]{}
 }
@@ -26,7 +30,7 @@ func (lista *listaEnlazada[T]) EstaVacia() bool {
 }
 
 func (lista *listaEnlazada[T]) InsertarPrimero(elemento T) {
-	nuevo := &nodoLista[T]{dato: elemento}
+	nuevo := crearNodo(elemento)
 	if lista.EstaVacia() {
 		lista.ultimo = nuevo
 	} else {
@@ -37,7 +41,7 @@ func (lista *listaEnlazada[T]) InsertarPrimero(elemento T) {
 }
 
 func (lista *listaEnlazada[T]) InsertarUltimo(elemento T) {
-	nuevo := &nodoLista[T]{dato: elemento}
+	nuevo := crearNodo(elemento)
 	if lista.EstaVacia() {
 		lista.primero = nuevo
 	} else {
@@ -79,12 +83,10 @@ func (lista *listaEnlazada[T]) Largo() int {
 }
 
 func (lista *listaEnlazada[T]) Iterar(visitar func(T) bool) {
-	iterador := lista.Iterador()
-	for iterador.HayAlgoMas() {
-		if !visitar(iterador.VerActual()) {
+	for actual := lista.primero; actual != nil; actual = actual.siguiente {
+		if !visitar(actual.dato) {
 			break
 		}
-		iterador.Avanzar()
 	}
 }
 
@@ -121,8 +123,9 @@ func (iterador *iterListaEnlazada[T]) Insertar(elemento T) {
 		iterador.actual = iterador.lista.primero
 	} else if !iterador.HayAlgoMas() {
 		iterador.lista.InsertarUltimo(elemento)
+		iterador.actual = iterador.lista.ultimo
 	} else {
-		nuevo := &nodoLista[T]{dato: elemento}
+		nuevo := crearNodo(elemento)
 		nuevo.siguiente = iterador.actual
 		iterador.anterior.siguiente = nuevo
 		iterador.actual = nuevo
