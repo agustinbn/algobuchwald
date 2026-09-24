@@ -89,7 +89,6 @@ func (lista *listaEnlazada[T]) Iterar(visitar func(T) bool) {
 }
 
 func (lista *listaEnlazada[T]) Iterador() IteradorLista[T] {
-	// puse esto para que buildee
 	return &iterListaEnlazada[T]{
 		lista:    lista,
 		anterior: nil,
@@ -117,11 +116,11 @@ func (iterador *iterListaEnlazada[T]) Avanzar() {
 }
 
 func (iterador *iterListaEnlazada[T]) Insertar(elemento T) {
-	if !iterador.HayAlgoMas() {
-		iterador.lista.InsertarUltimo(elemento)
-	} else if iterador.anterior == nil {
+	if iterador.anterior == nil {
 		iterador.lista.InsertarPrimero(elemento)
 		iterador.actual = iterador.lista.primero
+	} else if !iterador.HayAlgoMas() {
+		iterador.lista.InsertarUltimo(elemento)
 	} else {
 		nuevo := &nodoLista[T]{dato: elemento}
 		nuevo.siguiente = iterador.actual

@@ -68,6 +68,56 @@ func TestLargo(t *testing.T) {
 	require.EqualValues(t, 0, lista.Largo())
 }
 
+func TestListaVaciadaSeComportaComoRecienCreada(t *testing.T) {
+	lista := TDALista.CrearListaEnlazada[int]()
+	lista.InsertarPrimero(1)
+	lista.InsertarUltimo(2)
+	lista.BorrarPrimero()
+	lista.BorrarPrimero()
+
+	require.True(t, lista.EstaVacia())
+	require.PanicsWithValue(t, "La lista esta vacia", func() { lista.VerPrimero() })
+	require.PanicsWithValue(t, "La lista esta vacia", func() { lista.VerUltimo() })
+	require.PanicsWithValue(t, "La lista esta vacia", func() { lista.BorrarPrimero() })
+
+	lista.InsertarPrimero(10)
+	require.EqualValues(t, 10, lista.VerPrimero())
+	require.EqualValues(t, 10, lista.VerUltimo())
+}
+
+func TestListaConVolumenGrande(t *testing.T) {
+	lista := TDALista.CrearListaEnlazada[int]()
+
+	cantidad := 10000
+	for i := 0; i < cantidad; i++ {
+		lista.InsertarUltimo(i)
+		require.EqualValues(t, i, lista.VerUltimo())
+	}
+	for i := 0; i < cantidad; i++ {
+		require.EqualValues(t, i, lista.VerPrimero())
+		require.EqualValues(t, i, lista.BorrarPrimero())
+	}
+	require.True(t, lista.EstaVacia())
+}
+
+func TestListaConVariosDatos(t *testing.T) {
+	probarInsertarBorrar(t, []int{1, 2, 3})
+	probarInsertarBorrar(t, []string{"pepe", "pedro", "juan"})
+	probarInsertarBorrar(t, []bool{true, false, true})
+}
+
+func probarInsertarBorrar[T comparable](t *testing.T, valores []T) {
+	lista := TDALista.CrearListaEnlazada[T]()
+	for _, v := range valores {
+		lista.InsertarUltimo(v)
+	}
+	for _, v := range valores {
+		require.EqualValues(t, v, lista.VerPrimero())
+		require.EqualValues(t, v, lista.BorrarPrimero())
+	}
+	require.True(t, lista.EstaVacia())
+}
+
 func TestIteradorEnListaVacia(t *testing.T) {
 	lista := TDALista.CrearListaEnlazada[int]()
 	iterador := lista.Iterador()
@@ -113,6 +163,19 @@ func TestIteradorInsertarAlFinal(t *testing.T) {
 	require.EqualValues(t, 2, lista.BorrarPrimero())
 	require.EqualValues(t, 3, lista.BorrarPrimero())
 	require.True(t, lista.EstaVacia())
+}
+
+func TestIteradorInsertarEnListaVacia(t *testing.T) {
+	lista := TDALista.CrearListaEnlazada[int]()
+	iterador := lista.Iterador()
+	require.False(t, iterador.HayAlgoMas())
+
+	iterador.Insertar(1)
+
+	require.EqualValues(t, 1, lista.Largo())
+	require.EqualValues(t, 1, lista.VerPrimero())
+	require.EqualValues(t, 1, lista.VerUltimo())
+	require.EqualValues(t, 1, iterador.VerActual())
 }
 
 func TestIteradorInsertarEnElMedio(t *testing.T) {
@@ -184,6 +247,30 @@ func TestIteradorBorrarDelMedio(t *testing.T) {
 
 	require.EqualValues(t, 2, lista.Largo())
 	require.EqualValues(t, 6, iterador.VerActual())
+
+	elementos := []int{}
+	lista.Iterar(func(elemento int) bool {
+		elementos = append(elementos, elemento)
+		return true
+	})
+	require.EqualValues(t, []int{4, 6}, elementos)
+	require.NotContains(t, elementos, 5)
+}
+
+func TestIteradorBorrarTodosLosElementos(t *testing.T) {
+	lista := TDALista.CrearListaEnlazada[int]()
+	lista.InsertarUltimo(1)
+	lista.InsertarUltimo(2)
+	lista.InsertarUltimo(3)
+
+	iterador := lista.Iterador()
+	for iterador.HayAlgoMas() {
+		iterador.Borrar()
+	}
+
+	require.True(t, lista.EstaVacia())
+	require.EqualValues(t, 0, lista.Largo())
+	require.PanicsWithValue(t, "La lista esta vacia", func() { lista.VerPrimero() })
 }
 
 func TestIteradorBorrarUnicoElemento(t *testing.T) {
@@ -246,4 +333,19 @@ func TestIterarConCorte(t *testing.T) {
 		return false
 	})
 	require.EqualValues(t, []int{1}, elementos)
+}
+
+func TestIterarConCorteEnElMedio(t *testing.T) {
+	lista := TDALista.CrearListaEnlazada[int]()
+	lista.InsertarUltimo(1)
+	lista.InsertarUltimo(2)
+	lista.InsertarUltimo(3)
+	lista.InsertarUltimo(4)
+
+	elementos := []int{}
+	lista.Iterar(func(elemento int) bool {
+		elementos = append(elementos, elemento)
+		return elemento != 2
+	})
+	require.EqualValues(t, []int{1, 2}, elementos)
 }
