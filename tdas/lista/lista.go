@@ -1,10 +1,15 @@
 package lista
 
 type IteradorLista[T any] interface {
+	// VerActual devuelve el valor del elemento actual del iterador. Si el iterador ya itero todos los elementos devuelve un panic "El iterador esta al final de la lista".
 	VerActual() T
+	// HayAlgoMas devuelve verdadero si el iterador puede avanzar, false en caso contrario.
 	HayAlgoMas() bool
+	// Avanzar avanza el iterador a la siguiente posición de la lista. Si el iterador ya itero todos los elementos devuelve un panic "El iterador esta al final de la lista".
 	Avanzar()
+	// Insertar agrega un nuevo elemento en la posición actual del iterador.
 	Insertar(T)
+	// Borrar elimina el elemento actual del iterador y devuelve su valor. Si el iterador ya itero todos los elementos devuelve un panic "El iterador esta al final de la lista".
 	Borrar() T
 }
 

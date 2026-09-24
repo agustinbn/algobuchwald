@@ -79,12 +79,12 @@ func (lista *listaEnlazada[T]) Largo() int {
 }
 
 func (lista *listaEnlazada[T]) Iterar(visitar func(T) bool) {
-	actual := lista.primero
-	for actual != nil {
-		if !visitar(actual.dato) {
+	iterador := lista.Iterador()
+	for iterador.HayAlgoMas() {
+		if !visitar(iterador.VerActual()) {
 			break
 		}
-		actual = actual.siguiente
+		iterador.Avanzar()
 	}
 }
 
@@ -98,22 +98,56 @@ func (lista *listaEnlazada[T]) Iterador() IteradorLista[T] {
 }
 
 func (iterador *iterListaEnlazada[T]) VerActual() T {
-	var t T
-	return t
+	if !iterador.HayAlgoMas() {
+		panic("El iterador termino de iterar")
+	}
+	return iterador.actual.dato
 }
 
 func (iterador *iterListaEnlazada[T]) HayAlgoMas() bool {
-	return false
+	return iterador.actual != nil
 }
 
 func (iterador *iterListaEnlazada[T]) Avanzar() {
+	if !iterador.HayAlgoMas() {
+		panic("El iterador termino de iterar")
+	}
+	iterador.anterior = iterador.actual
+	iterador.actual = iterador.actual.siguiente
 }
 
 func (iterador *iterListaEnlazada[T]) Insertar(elemento T) {
-
+	if !iterador.HayAlgoMas() {
+		iterador.lista.InsertarUltimo(elemento)
+	} else if iterador.anterior == nil {
+		iterador.lista.InsertarPrimero(elemento)
+		iterador.actual = iterador.lista.primero
+	} else {
+		nuevo := &nodoLista[T]{dato: elemento}
+		nuevo.siguiente = iterador.actual
+		iterador.anterior.siguiente = nuevo
+		iterador.actual = nuevo
+		iterador.lista.largo++
+	}
 }
 
 func (iterador *iterListaEnlazada[T]) Borrar() T {
-	var t T
-	return t
+	if !iterador.HayAlgoMas() {
+		panic("El iterador termino de iterar")
+	}
+	dato := iterador.actual.dato
+	if iterador.anterior == nil {
+		iterador.lista.BorrarPrimero()
+		iterador.actual = iterador.lista.primero
+	} else {
+		if iterador.actual.siguiente == nil {
+			iterador.anterior.siguiente = nil
+			iterador.lista.ultimo = iterador.anterior
+		} else {
+			iterador.anterior.siguiente = iterador.actual.siguiente
+		}
+		iterador.actual = iterador.anterior.siguiente
+		iterador.lista.largo--
+	}
+	return dato
 }
