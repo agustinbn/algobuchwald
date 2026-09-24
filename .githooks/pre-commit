@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -eu
+
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+
+git diff --cached --name-only --diff-filter=ACMR -- '*.go' | while IFS= read -r file; do
+	[ -f "$file" ] || continue
+	gofmt -w "$file"
+	git add -- "$file"
+done

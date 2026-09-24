@@ -1,9 +1,9 @@
 package lista_test
 
 import (
+	"github.com/stretchr/testify/require"
 	TDALista "tdas/lista"
 	"testing"
-	"github.com/stretchr/testify/require"
 )
 
 func TestListaRecienCreada(t *testing.T) {
@@ -20,7 +20,7 @@ func TestInsertarPrimeroYUltimo(t *testing.T) {
 	require.EqualValues(t, 1, lista.VerPrimero())
 	require.EqualValues(t, 1, lista.VerUltimo())
 	require.EqualValues(t, 1, lista.Largo())
-	
+
 	lista.InsertarUltimo(2)
 	require.EqualValues(t, 1, lista.VerPrimero())
 	require.EqualValues(t, 2, lista.VerUltimo())
@@ -31,12 +31,12 @@ func TestBorrarPrimero(t *testing.T) {
 	lista := TDALista.CrearListaEnlazada[int]()
 	lista.InsertarPrimero(1)
 	lista.InsertarUltimo(2)
-	
+
 	require.EqualValues(t, 1, lista.BorrarPrimero())
 	require.EqualValues(t, 2, lista.VerPrimero())
 	require.EqualValues(t, 2, lista.VerUltimo())
 	require.EqualValues(t, 1, lista.Largo())
-	
+
 	require.EqualValues(t, 2, lista.BorrarPrimero())
 	require.True(t, lista.EstaVacia())
 	require.EqualValues(t, 0, lista.Largo())
@@ -46,7 +46,7 @@ func TestVerPrimeroYUltimo(t *testing.T) {
 	lista := TDALista.CrearListaEnlazada[int]()
 	lista.InsertarPrimero(1)
 	lista.InsertarUltimo(2)
-	
+
 	require.EqualValues(t, 1, lista.VerPrimero())
 	require.EqualValues(t, 2, lista.VerUltimo())
 }
@@ -54,16 +54,16 @@ func TestVerPrimeroYUltimo(t *testing.T) {
 func TestLargo(t *testing.T) {
 	lista := TDALista.CrearListaEnlazada[int]()
 	require.EqualValues(t, 0, lista.Largo())
-	
+
 	lista.InsertarPrimero(1)
 	require.EqualValues(t, 1, lista.Largo())
-	
+
 	lista.InsertarUltimo(2)
 	require.EqualValues(t, 2, lista.Largo())
-	
+
 	lista.BorrarPrimero()
 	require.EqualValues(t, 1, lista.Largo())
-	
+
 	lista.BorrarPrimero()
 	require.EqualValues(t, 0, lista.Largo())
 }
@@ -296,7 +296,6 @@ func TestIteradorAvanzarYVerActualConPANIC(t *testing.T) {
 	require.PanicsWithValue(t, "El iterador termino de iterar", func() { iterador.Avanzar() })
 	require.PanicsWithValue(t, "El iterador termino de iterar", func() { iterador.Borrar() })
 }
-
 
 func TestIterarSinCorte(t *testing.T) {
 	lista := TDALista.CrearListaEnlazada[int]()

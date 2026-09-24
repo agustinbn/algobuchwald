@@ -34,6 +34,7 @@ go.work.sum
 .DS_Store
 tp0/tp0
 tp1/maze
+tp1/pruebas/maze
 tp2/tp2
 tp3/tp3
 *.in

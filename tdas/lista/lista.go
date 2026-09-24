@@ -19,7 +19,7 @@ type Lista[T any] interface {
 
 	// InsertarPrimero agrega un nuevo elemento al principio de la lista.
 	InsertarPrimero(T)
-	
+
 	// InsertarUltimo agrega un nuevo elemento al final de la lista.
 	InsertarUltimo(T)
 
