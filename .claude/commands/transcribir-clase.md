@@ -38,4 +38,5 @@ Antes de escribir, mirá 2 o 3 archivos de `notes/*.md` (por ejemplo `notes/08-2
 
 ## Paso 4: Confirmar
 
-Al terminar, mostrale al usuario la ruta del archivo creado y un resumen breve (2-3 líneas) de los temas cubiertos. No hace falta commitear ni pushear salvo que el usuario lo pida explícitamente.
+Al terminar, mostrale al usuario la ruta del archivo creado y un resumen breve (2-3 líneas) de los temas cubiertos. Por ultimo, commitea el archivo al repo con un mensaje de commit que incluya la fecha de la clase y un resumen de los temas tratados, y pushealo a main.
+
