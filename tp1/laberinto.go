@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type Posicion struct {
 	fila    int
 	columna int
@@ -20,6 +18,19 @@ const (
 	_SIGNO_FIN    byte = 'E'
 	_SIGNO_PARED  byte = '#'
 )
+
+type Direccion struct {
+	signo        string
+	deltaFila    int
+	deltaColumna int
+}
+
+var _DIRECCIONES = []Direccion{
+	{"ARRIBA", -1, 0},
+	{"ABAJO", 1, 0},
+	{"IZQUIERDA", 0, -1},
+	{"DERECHA", 0, 1},
+}
 
 func (laberinto *Laberinto) esTransitable(pos Posicion) bool {
 	if pos.fila < 0 || pos.fila >= laberinto.filas || pos.columna < 0 || pos.columna >= laberinto.columnas {
@@ -42,21 +53,4 @@ func (laberinto *Laberinto) registrarSignos(fila int) {
 			laberinto.fin = Posicion{fila, columna}
 		}
 	}
-}
-
-func leerLaberinto() (Laberinto, bool) {
-	var laberinto Laberinto
-
-	if _, err := fmt.Scan(&laberinto.filas, &laberinto.columnas); err != nil {
-		return laberinto, false
-	}
-
-	laberinto.paredes = make([]string, laberinto.filas)
-
-	for fila := range laberinto.filas {
-		fmt.Scan(&laberinto.paredes[fila])
-		laberinto.registrarSignos(fila)
-	}
-
-	return laberinto, true
 }
