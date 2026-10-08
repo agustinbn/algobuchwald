@@ -23,18 +23,18 @@ const (
 )
 
 type hashCerrado[K comparable, V any] struct {
-	tabla    []*celdaHash[K, V]
+	tabla    []*celda[K, V]
 	tam      int
 	cant     int
 	borrados int
 }
 
-type interHash[K comparable, V any] struct {
+type iterDiccionario[K comparable, V any] struct {
 	diccionario *hashCerrado[K, V]
 	pos         int
 }
 
-type celdaHash[K comparable, V any] struct {
+type celda[K comparable, V any] struct {
 	clave  K
 	dato   V
 	estado celdaEstado
@@ -50,9 +50,7 @@ func (hash *hashCerrado[K, V]) Guardar(clave K, dato V) {
 		return
 	}
 
-	if (hash.cant+hash.borrados+1)*_FACTOR_CARGA_DENOMINADOR >= hash.tam*_FACTOR_CARGA_NUMERADOR {
-		hash.redimensionar(hash.tam * _FACTOR_EXPANSION)
-	}
+	hash.redimensionarSiCorresponde(1)
 
 	primeroBorrado := _POSICION_INVALIDA
 	pos := hash.funcionHash(clave)
@@ -102,7 +100,7 @@ func (hash *hashCerrado[K, V]) Borrar(clave K) V {
 	hash.tabla[pos].estado = _BORRADA
 	hash.cant--
 	hash.borrados++
-	hash.achicarSiCorresponde()
+	hash.redimensionarSiCorresponde(0)
 	return dato
 }
 
@@ -110,11 +108,11 @@ func (hash *hashCerrado[K, V]) Cantidad() int {
 	return hash.cant
 }
 
-func (iter *interHash[K, V]) HayAlgoMas() bool {
+func (iter *iterDiccionario[K, V]) HayAlgoMas() bool {
 	return iter.pos < iter.diccionario.tam && iter.diccionario.tabla[iter.pos].estado == _OCUPADA
 }
 
-func (iter *interHash[K, V]) VerActual() (K, V) {
+func (iter *iterDiccionario[K, V]) VerActual() (K, V) {
 	if !iter.HayAlgoMas() {
 		panic("El iterador termino de iterar")
 	}
@@ -122,7 +120,7 @@ func (iter *interHash[K, V]) VerActual() (K, V) {
 	return celda.clave, celda.dato
 }
 
-func (iter *interHash[K, V]) Avanzar() {
+func (iter *iterDiccionario[K, V]) Avanzar() {
 	if !iter.HayAlgoMas() {
 		panic("El iterador termino de iterar")
 	}
@@ -130,18 +128,18 @@ func (iter *interHash[K, V]) Avanzar() {
 }
 
 func (hash *hashCerrado[K, V]) Iterar(visitante func(clave K, dato V) bool) {
-	iter := hash.Iterador()
-	for iter.HayAlgoMas() {
-		clave, dato := iter.VerActual()
-		if !visitante(clave, dato) {
+	for _, celda := range hash.tabla {
+		if celda.estado != _OCUPADA {
+			continue
+		}
+		if !visitante(celda.clave, celda.dato) {
 			return
 		}
-		iter.Avanzar()
 	}
 }
 
 func (hash *hashCerrado[K, V]) Iterador() IterDiccionario[K, V] {
-	iter := new(interHash[K, V])
+	iter := new(iterDiccionario[K, V])
 	iter.diccionario = hash
 	iter.pos = hash.posOcupada(0)
 	return iter
@@ -154,16 +152,16 @@ func (hash *hashCerrado[K, V]) posOcupada(pos int) int {
 	return pos
 }
 
-func crearTabla[K comparable, V any](tam int) []*celdaHash[K, V] {
-	tabla := make([]*celdaHash[K, V], tam)
+func crearTabla[K comparable, V any](tam int) []*celda[K, V] {
+	tabla := make([]*celda[K, V], tam)
 	for i := range tabla {
-		tabla[i] = &celdaHash[K, V]{estado: _VACIA}
+		tabla[i] = &celda[K, V]{estado: _VACIA}
 	}
 	return tabla
 }
 
-func crearCelda[K comparable, V any](clave K, dato V) *celdaHash[K, V] {
-	return &celdaHash[K, V]{clave: clave, dato: dato, estado: _OCUPADA}
+func crearCelda[K comparable, V any](clave K, dato V) *celda[K, V] {
+	return &celda[K, V]{clave: clave, dato: dato, estado: _OCUPADA}
 }
 
 func (hash *hashCerrado[K, V]) funcionHash(clave K) int {
@@ -215,7 +213,12 @@ func (hash *hashCerrado[K, V]) insertarSinRedimensionar(clave K, dato V) {
 	}
 }
 
-func (hash *hashCerrado[K, V]) achicarSiCorresponde() {
+func (hash *hashCerrado[K, V]) redimensionarSiCorresponde(cambio int) {
+	if (hash.cant+hash.borrados+cambio)*_FACTOR_CARGA_DENOMINADOR >= hash.tam*_FACTOR_CARGA_NUMERADOR {
+		hash.redimensionar(hash.tam * _FACTOR_EXPANSION)
+		return
+	}
+
 	if hash.tam > _CAPACIDAD_INICIAL && hash.cant*_FACTOR_REDUCCION <= hash.tam {
 		nuevoTam := hash.tam / _FACTOR_EXPANSION
 		nuevoTam = max(nuevoTam, _CAPACIDAD_INICIAL)
