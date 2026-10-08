@@ -72,11 +72,7 @@ func (hash *hashCerrado[K, V]) Guardar(clave K, dato V) {
 				hash.borrados--
 			}
 
-			hash.tabla[pos] = &celdaHash[K, V]{
-				clave:  clave,
-				dato:   dato,
-				estado: _OCUPADA,
-			}
+			hash.tabla[pos] = crearCelda(clave, dato)
 			hash.cant++
 			return
 		}
@@ -166,6 +162,10 @@ func crearTabla[K comparable, V any](tam int) []*celdaHash[K, V] {
 	return tabla
 }
 
+func crearCelda[K comparable, V any](clave K, dato V) *celdaHash[K, V] {
+	return &celdaHash[K, V]{clave: clave, dato: dato, estado: _OCUPADA}
+}
+
 func (hash *hashCerrado[K, V]) funcionHash(clave K) int {
 	h := fnv.New64a()
 	_, _ = fmt.Fprint(h, clave)
@@ -207,7 +207,7 @@ func (hash *hashCerrado[K, V]) insertarSinRedimensionar(clave K, dato V) {
 
 	for intentos := 0; intentos < hash.tam; intentos++ {
 		if hash.tabla[pos].estado != _OCUPADA || hash.tabla[pos].estado == _BORRADA {
-			hash.tabla[pos] = &celdaHash[K, V]{clave: clave, dato: dato, estado: _OCUPADA}
+			hash.tabla[pos] = crearCelda(clave, dato)
 			hash.cant++
 			return
 		}
