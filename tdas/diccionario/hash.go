@@ -206,12 +206,7 @@ func (hash *hashCerrado[K, V]) insertarSinRedimensionar(clave K, dato V) {
 	pos := hash.funcionHash(clave)
 
 	for intentos := 0; intentos < hash.tam; intentos++ {
-		if hash.tabla[pos].estado != _OCUPADA {
-			hash.tabla[pos] = &celdaHash[K, V]{clave: clave, dato: dato, estado: _OCUPADA}
-			hash.cant++
-			return
-		}
-		if hash.tabla[pos].estado == _BORRADA {
+		if hash.tabla[pos].estado != _OCUPADA || hash.tabla[pos].estado == _BORRADA {
 			hash.tabla[pos] = &celdaHash[K, V]{clave: clave, dato: dato, estado: _OCUPADA}
 			hash.cant++
 			return
