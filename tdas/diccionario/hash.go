@@ -128,21 +128,26 @@ func (iter *iterDiccionario[K, V]) Avanzar() {
 }
 
 func (hash *hashCerrado[K, V]) Iterar(visitante func(clave K, dato V) bool) {
-	for _, celda := range hash.tabla {
-		if celda.estado != _OCUPADA {
-			continue
-		}
-		if !visitante(celda.clave, celda.dato) {
+	iter := hash.crearIterador()
+	for iter.HayAlgoMas() {
+		clave, dato := iter.VerActual()
+		if !visitante(clave, dato) {
 			return
 		}
+		iter.Avanzar()
 	}
 }
 
 func (hash *hashCerrado[K, V]) Iterador() IterDiccionario[K, V] {
+	iter := hash.crearIterador()
+	return &iter
+}
+
+func (hash *hashCerrado[K, V]) crearIterador() iterDiccionario[K, V] {
 	iter := new(iterDiccionario[K, V])
 	iter.diccionario = hash
 	iter.pos = hash.posOcupada(0)
-	return iter
+	return *iter
 }
 
 func (hash *hashCerrado[K, V]) posOcupada(pos int) int {

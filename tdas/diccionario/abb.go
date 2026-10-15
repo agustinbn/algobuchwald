@@ -139,7 +139,7 @@ func (iter *iterAbb[K, V]) apilarIzq(nodo *nodoAbb[K, V]) {
 }
 
 func (arbol *abb[K, V]) Iterar(visitar func(clave K, dato V) bool) {
-	iter := arbol.Iterador()
+	iter := arbol.IteradorRango(nil, nil)
 	for iter.HayAlgoMas() {
 		clave, dato := iter.VerActual()
 		if !visitar(clave, dato) {
