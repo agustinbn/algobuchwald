@@ -6,8 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	TDADiccionario "tdas/diccionario"
+
+	"github.com/stretchr/testify/require"
 )
 
 func comparacionInt(a, b int) int {
@@ -141,4 +142,124 @@ func TestABBVolumen(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestIterar(t *testing.T) {
+	t.Log("Itera sobre todas las claves en orden")
+	abb := crearArbolInt([]int{50, 30, 70, 20, 40, 60, 80})
+	var claves []int
+	abb.Iterar(func(clave int, dato int) bool {
+		claves = append(claves, clave)
+		return true
+	})
+	require.EqualValues(t, []int{20, 30, 40, 50, 60, 70, 80}, claves)
+}
+
+func TestIterarRango(t *testing.T) {
+	t.Log("Itera sobre un rango de claves en orden")
+	abb := crearArbolInt([]int{50, 30, 70, 20, 40, 60, 80})
+	var claves []int
+	desde := 35
+	hasta := 75
+	abb.IterarRango(&desde, &hasta, func(clave int, dato int) bool {
+		claves = append(claves, clave)
+		return true
+	})
+	require.EqualValues(t, []int{40, 50, 60, 70}, claves)
+}
+
+func TestIterador(t *testing.T) {
+	t.Log("Itera sobre todas las claves en orden usando un iterador")
+	abb := crearArbolInt([]int{50, 30, 70, 20, 40, 60, 80})
+	iter := abb.Iterador()
+	var claves []int
+	for iter.HayAlgoMas() {
+		clave, _ := iter.VerActual()
+		claves = append(claves, clave)
+		iter.Avanzar()
+	}
+	require.EqualValues(t, []int{20, 30, 40, 50, 60, 70, 80}, claves)
+}
+
+func TestIteradorRango(t *testing.T) {
+	t.Log("Itera sobre un rango de claves en orden usando un iterador")
+	abb := crearArbolInt([]int{50, 30, 70, 20, 40, 60, 80})
+	desde := 35
+	hasta := 75
+	iter := abb.IteradorRango(&desde, &hasta)
+	var claves []int
+	for iter.HayAlgoMas() {
+		clave, _ := iter.VerActual()
+		claves = append(claves, clave)
+		iter.Avanzar()
+	}
+	require.EqualValues(t, []int{40, 50, 60, 70}, claves)
+}
+
+func TestIterarSuma(t *testing.T) {
+	t.Log("Itera sobre todas las claves en orden y suma los datos")
+	abb := crearArbolInt([]int{50, 30, 70, 20, 40, 60, 80})
+	suma := 0
+	abb.Iterar(func(clave int, dato int) bool {
+		suma += dato
+		return true
+	})
+	require.EqualValues(t, 3500, suma)
+}
+
+func TestIterarRangoSuma(t *testing.T) {
+	t.Log("Itera sobre un rango de claves en orden y suma los datos")
+	abb := crearArbolInt([]int{50, 30, 70, 20, 40, 60, 80})
+	desde := 35
+	hasta := 75
+	suma := 0
+	abb.IterarRango(&desde, &hasta, func(clave int, dato int) bool {
+		suma += dato
+		return true
+	})
+	require.EqualValues(t, 2200, suma)
+}
+
+func TestIterarCondicionCorte(t *testing.T) {
+	t.Log("Itera sobre todas las claves en orden y corta la iteración con una condición")
+	abb := crearArbolInt([]int{50, 30, 70, 20, 40, 60, 80})
+	var claves []int
+	abb.Iterar(func(clave int, dato int) bool {
+		claves = append(claves, clave)
+		return clave != 60
+	})
+	require.EqualValues(t, []int{20, 30, 40, 50, 60}, claves)
+}
+
+func TestIterarVacio(t *testing.T) {
+	t.Log("Iterar sobre un ABB vacío no llama a la función")
+	abb := TDADiccionario.CrearABB[int, int](comparacionInt)
+	abb.Iterar(func(clave int, dato int) bool {
+		require.Fail(t, "No debería llamarse a la función")
+		return true
+	})
+}
+
+func TestIterarRangoNilHasta(t *testing.T) {
+	t.Log("Itera sobre un rango con hasta nil, incluyendo todas las claves mayores o iguales a desde")
+	abb := crearArbolInt([]int{50, 30, 70, 20, 40, 60, 80})
+	desde := 40
+	var claves []int
+	abb.IterarRango(&desde, nil, func(clave int, dato int) bool {
+		claves = append(claves, clave)
+		return true
+	})
+	require.EqualValues(t, []int{40, 50, 60, 70, 80}, claves)
+}
+
+func TestIterarRangoNilDesde(t *testing.T) {
+	t.Log("Itera sobre un rango con desde nil, incluyendo todas las claves menores o iguales a hasta")
+	abb := crearArbolInt([]int{50, 30, 70, 20, 40, 60, 80})
+	hasta := 60
+	var claves []int
+	abb.IterarRango(nil, &hasta, func(clave int, dato int) bool {
+		claves = append(claves, clave)
+		return true
+	})
+	require.EqualValues(t, []int{20, 30, 40, 50, 60}, claves)
 }

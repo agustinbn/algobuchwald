@@ -1,5 +1,7 @@
 package diccionario
 
+import "tdas/pila"
+
 type nodoAbb[K comparable, V any] struct {
 	izquierdo *nodoAbb[K, V]
 	derecho   *nodoAbb[K, V]
@@ -11,6 +13,13 @@ type abb[K comparable, V any] struct {
 	raiz     *nodoAbb[K, V]
 	cantidad int
 	cmp      func(K, K) int
+}
+
+type iterAbb[K comparable, V any] struct {
+	arbol *abb[K, V]
+	pila  pila.Pila[*nodoAbb[K, V]]
+	desde *K
+	hasta *K
 }
 
 func CrearABB[K comparable, V any](funcion_cmp func(K, K) int) DiccionarioOrdenado[K, V] {
@@ -96,20 +105,75 @@ func (arbol *abb[K, V]) Cantidad() int {
 	return arbol.cantidad
 }
 
+func (iter *iterAbb[K, V]) HayAlgoMas() bool {
+	return !iter.pila.EstaVacia()
+}
+
+func (iter *iterAbb[K, V]) VerActual() (K, V) {
+	if !iter.HayAlgoMas() {
+		panic("El iterador termino de iterar")
+	}
+	nodo := iter.pila.VerTope()
+	return nodo.clave, nodo.dato
+}
+
+func (iter *iterAbb[K, V]) Avanzar() {
+	if !iter.HayAlgoMas() {
+		panic("El iterador termino de iterar")
+	}
+	nodo := iter.pila.Desapilar()
+	iter.apilarIzq(nodo.derecho)
+}
+
+func (iter *iterAbb[K, V]) apilarIzq(nodo *nodoAbb[K, V]) {
+	for nodo != nil {
+		if iter.desde != nil && iter.arbol.cmp(nodo.clave, *iter.desde) < 0 {
+			nodo = nodo.derecho
+		} else if iter.hasta != nil && iter.arbol.cmp(nodo.clave, *iter.hasta) > 0 {
+			nodo = nodo.izquierdo
+		} else {
+			iter.pila.Apilar(nodo)
+			nodo = nodo.izquierdo
+		}
+	}
+}
+
 func (arbol *abb[K, V]) Iterar(visitar func(clave K, dato V) bool) {
+	iter := arbol.Iterador()
+	for iter.HayAlgoMas() {
+		clave, dato := iter.VerActual()
+		if !visitar(clave, dato) {
+			return
+		}
+		iter.Avanzar()
+	}
 }
 
 func (arbol *abb[K, V]) Iterador() IterDiccionario[K, V] {
-	return nil
+	return arbol.IteradorRango(nil, nil)
 }
 
 func (arbol *abb[K, V]) IterarRango(desde *K, hasta *K, visitar func(clave K, dato V) bool) {
+	iter := arbol.IteradorRango(desde, hasta)
+	for iter.HayAlgoMas() {
+		clave, dato := iter.VerActual()
+		if !visitar(clave, dato) {
+			return
+		}
+		iter.Avanzar()
+	}
 }
 
 func (arbol *abb[K, V]) IteradorRango(desde *K, hasta *K) IterDiccionario[K, V] {
-	return nil
+	iter := &iterAbb[K, V]{
+		arbol: arbol,
+		pila:  pila.CrearPilaDinamica[*nodoAbb[K, V]](),
+		desde: desde,
+		hasta: hasta,
+	}
+	iter.apilarIzq(arbol.raiz)
+	return iter
 }
-
 func crearNodoAbb[K comparable, V any](clave K, dato V) *nodoAbb[K, V] {
 	return &nodoAbb[K, V]{
 		clave:     clave,
