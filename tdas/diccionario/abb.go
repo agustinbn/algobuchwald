@@ -1,6 +1,6 @@
 package diccionario
 
-import "tdas/pila"
+import TDAPila "tdas/pila"
 
 type nodoAbb[K comparable, V any] struct {
 	izquierdo *nodoAbb[K, V]
@@ -17,7 +17,7 @@ type abb[K comparable, V any] struct {
 
 type iterAbb[K comparable, V any] struct {
 	arbol *abb[K, V]
-	pila  pila.Pila[*nodoAbb[K, V]]
+	pila  TDAPila.Pila[*nodoAbb[K, V]]
 	desde *K
 	hasta *K
 }
@@ -167,7 +167,7 @@ func (arbol *abb[K, V]) IterarRango(desde *K, hasta *K, visitar func(clave K, da
 func (arbol *abb[K, V]) IteradorRango(desde *K, hasta *K) IterDiccionario[K, V] {
 	iter := &iterAbb[K, V]{
 		arbol: arbol,
-		pila:  pila.CrearPilaDinamica[*nodoAbb[K, V]](),
+		pila:  TDAPila.CrearPilaDinamica[*nodoAbb[K, V]](),
 		desde: desde,
 		hasta: hasta,
 	}
