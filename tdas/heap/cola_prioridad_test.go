@@ -1,8 +1,9 @@
-package cola_prioridad
+package cola_prioridad_test
 
 import (
-	"strings"
 	TDAHeap "tdas/heap"
+
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,7 +14,7 @@ func comparacionInt(a, b int) int {
 }
 
 func TestHeap(t *testing.T) {
-	heap := TDAHeap.CrearHeap[int](comparacionInt)
+	heap := TDAHeap.CrearHeap(comparacionInt)
 	require.True(t, heap.EstaVacia())
 	require.EqualValues(t, 0, heap.Cantidad())
 
@@ -42,7 +43,7 @@ func TestHeap(t *testing.T) {
 }
 
 func TestHeapVacio(t *testing.T) {
-	heap := TDAHeap.CrearHeap[int](comparacionInt)
+	heap := TDAHeap.CrearHeap(comparacionInt)
 	require.EqualValues(t, 0, heap.Cantidad())
 	require.True(t, heap.EstaVacia())
 	require.PanicsWithValue(t, "La cola esta vacia", func() { heap.VerMax() })
@@ -50,7 +51,7 @@ func TestHeapVacio(t *testing.T) {
 }
 
 func TestHeapRedimension(t *testing.T) {
-	heap := TDAHeap.CrearHeap[int](comparacionInt)
+	heap := TDAHeap.CrearHeap(comparacionInt)
 
 	for i := 0; i < 100; i++ {
 		heap.Encolar(i)
@@ -65,7 +66,7 @@ func TestHeapRedimension(t *testing.T) {
 }
 
 func TestHeapStrings(t *testing.T) {
-	heap := TDAHeap.CrearHeap[string](strings.Compare)
+	heap := TDAHeap.CrearHeap(strings.Compare)
 	require.True(t, heap.EstaVacia())
 	require.EqualValues(t, 0, heap.Cantidad())
 
@@ -94,7 +95,7 @@ func TestHeapStrings(t *testing.T) {
 }
 
 func TestHeapEncolarDesencolar(t *testing.T) {
-	heap := TDAHeap.CrearHeap[int](comparacionInt)
+	heap := TDAHeap.CrearHeap(comparacionInt)
 
 	for i := 0; i < 10; i++ {
 		heap.Encolar(i)
@@ -109,7 +110,7 @@ func TestHeapEncolarDesencolar(t *testing.T) {
 }
 
 func TestHeapUnElemento(t *testing.T) {
-	heap := TDAHeap.CrearHeap[int](comparacionInt)
+	heap := TDAHeap.CrearHeap(comparacionInt)
 
 	heap.Encolar(5)
 	require.EqualValues(t, 1, heap.Cantidad())
@@ -122,7 +123,7 @@ func TestHeapUnElemento(t *testing.T) {
 }
 
 func TestHeapVolumenGrande(t *testing.T) {
-	heap := TDAHeap.CrearHeap[int](comparacionInt)
+	heap := TDAHeap.CrearHeap(comparacionInt)
 
 	for i := 0; i < 10000; i++ {
 		heap.Encolar(i)
