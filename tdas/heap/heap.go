@@ -38,7 +38,7 @@ func (h *heap[T]) Encolar(elemento T) {
 	}
 	h.datos[h.cantidad] = elemento
 	h.cantidad++
-	h.upHeap(h.cantidad - 1)
+	upHeap(h.datos[:h.cantidad], h.cantidad-1, h.cmp)
 }
 
 func (h *heap[T]) VerMax() T {
@@ -59,7 +59,7 @@ func (h *heap[T]) Desencolar() T {
 		nuevaCapacidad := max(len(h.datos)/_FACTOR_REDIMENSION, _CAPACIDAD_INICIAL)
 		h.redimensionar(nuevaCapacidad)
 	}
-	h.downHeap(0)
+	downHeap(h.datos, h.cantidad, 0, h.cmp)
 	return elemento
 }
 
@@ -67,29 +67,35 @@ func (h *heap[T]) Cantidad() int {
 	return h.cantidad
 }
 
-func (h *heap[T]) downHeap(i int) {
+func downHeap[T any](datos []T, cantidad, i int, cmp func(T, T) int) {
 	izq, der := 2*i+1, 2*i+2
+	if izq >= cantidad {
+		return
+	}
 	mayor := izq
-	if der < h.cantidad {
-		mayor = h.maxIndice(izq, der)
+	if der < cantidad && cmp(datos[der], datos[izq]) > 0 {
+		mayor = der
 	}
-	if izq < h.cantidad && h.cmp(h.datos[mayor], h.datos[i]) > 0 {
-		swap(&h.datos[i], &h.datos[mayor])
-		h.downHeap(mayor)
+	if cmp(datos[mayor], datos[i]) > 0 {
+		swap(&datos[i], &datos[mayor])
+		downHeap(datos, cantidad, mayor, cmp)
 	}
-}
-func (h *heap[T]) maxIndice(a, b int) int {
-	if h.cmp(h.datos[b], h.datos[a]) > 0 {
-		return b
-	}
-	return a
 }
 
-func (h *heap[T]) upHeap(i int) {
+func upHeap[T any](datos []T, i int, cmp func(T, T) int) {
+	if i == 0 {
+		return
+	}
 	padre := (i - 1) / 2
-	if i != 0 && h.cmp(h.datos[padre], h.datos[i]) < 0 {
-		swap(&h.datos[padre], &h.datos[i])
-		h.upHeap(padre)
+	if cmp(datos[padre], datos[i]) < 0 {
+		swap(&datos[padre], &datos[i])
+		upHeap(datos, padre, cmp)
+	}
+}
+
+func heapify[T any](datos []T, cantidad int, cmp func(T, T) int) {
+	for i := cantidad/2 - 1; i >= 0; i-- {
+		downHeap(datos, cantidad, i, cmp)
 	}
 }
 
